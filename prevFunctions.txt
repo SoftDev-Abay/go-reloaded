@@ -1,0 +1,159 @@
+func reverseBytes(bytes []byte) {
+	for i, j := 0, len(bytes)-1; i < j; i, j = i+1, j-1 {
+		bytes[i], bytes[j] = bytes[j], bytes[i]
+	}
+}
+
+func replaceA(input []byte) [][]int {
+	re := regexp.MustCompile(`abay`)
+	indices := re.FindAllStringIndex(string(input), -1)
+	return indices
+	// fmt.Println(indices) // [[14 16] [17 19] [24 26] [27 29]]
+}
+
+func findNwordsBefore(input []byte, index int, n int) [][]int {
+	var resultWords [][]int
+	for n > 0 {
+		word := findWordBefore(input, index)
+		resultWords = append(resultWords, word)
+		index = word[1]
+		n--
+	}
+	return resultWords
+}
+
+func findWordBefore(input []byte, index int) []int {
+	wordIndexes := make([]int, 2)
+
+	for index > 0 {
+		if isLetter(input[index]) {
+			wordIndexes[0] = index
+			break
+		}
+		index--
+	}
+
+	for index > 0 {
+		if isLetter(input[index]) {
+		} else {
+			wordIndexes[1] = index
+			break
+		}
+		if index-1 > 0 {
+			index--
+		} else {
+			wordIndexes[1] = 0 // can be simply index
+			break
+		}
+	}
+
+	return wordIndexes
+}
+
+func findWordAfter(input []byte, index int) []int {
+	wordIndexes := make([]int, 2)
+
+	for wordIndexes[0] == 0 && index < len(input) {
+		if isLetter(input[index]) {
+			wordIndexes[0] = index
+			break
+		}
+		index++
+	}
+
+	for wordIndexes[1] == 0 && index < len(input) {
+		if isLetter(input[index]) {
+		} else {
+			wordIndexes[1] = index
+		}
+		if index+1 < len(input) {
+			index++
+		} else {
+			wordIndexes[1] = len(input) - 1 // can be simply index
+			break
+		}
+	}
+
+	return wordIndexes
+}
+
+func isLetter(letter byte) bool {
+	if letter >= 97 && letter <= 122 || letter >= 65 && letter <= 90 {
+		return true
+	}
+	return false
+}
+
+// func useHex(input []byte) []byte {
+// 	re := regexp.MustCompile(`(hex)`)
+// 	indices := re.FindAllStringIndex(string(input), -1)
+
+// 	for i := 0; i < len(indices); i++ {
+// 		binToChangeRange := findBinNumBefore(input, indices[i][0]-1)
+// 		binBytes := input[binToChangeRange[1] : binToChangeRange[0]]
+// 		numBin, err := strconv.Atoi(string(binBytes))
+
+// 		if err != nil{
+// 			fmt.Println(err)
+// 		}
+
+// 		decimal := convertFromBase10(numBin, "01")
+
+// 		// fmt.Println(wordToChangeRange)
+
+// 		for j := wordToChangeRange[0]; j >= wordToChangeRange[1]; j-- {
+// 			input[j] = byte(unicode.ToLower(rune(input[j])))
+// 		}
+// 		// input = append(input[0:indices[i][0]-1], input[indices[i][1]+2:]...)
+// 		// shiftElementsToNtimesLeft(input, indices[i][0], 4)
+// 	}
+
+// 	return input
+// }
+
+// func useUp(input []byte) []byte {
+// 	re := regexp.MustCompile(`(up)`)
+
+// 	countUp := len(re.FindAllString(string(input[:]), -1))
+
+// 	for i := 0; i < countUp; i++ {
+// 		indices := re.FindStringIndex(string(input[:]))
+
+// 		wordToChangeRange := findWordBefore(input, indices[0]-1)
+// 		fmt.Println(wordToChangeRange)
+// 		for j := wordToChangeRange[0]; j >= wordToChangeRange[1]; j-- {
+// 			input[j] = byte(unicode.ToUpper(rune(input[j])))
+// 		}
+// 		fmt.Println(indices[i])
+// 		// input = append(input[0:indices[i][0]-1], input[indices[i][1]+2:]...)
+// 		// shiftElementsToNtimesLeft(input, indices[i][0], 4)
+// 	}
+
+// 	reMultipule := regexp.MustCompile(`\(up, \d{1,8}\)`)
+// 	countUpWithNum := len(reMultipule.FindAllString(string(input[:]), -1))
+
+// 	for i := 0; i < countUpWithNum; i++ {
+
+// 		upStrRange := reMultipule.FindStringIndex(string(input[:]))
+// 		var numStrToUse []byte
+// 		for j := upStrRange[1] - 2; input[j] != ' '; j-- {
+// 			numStrToUse = append(numStrToUse, input[j])
+// 		}
+// 		reverseBytes(numStrToUse)
+// 		numToUse, err := strconv.Atoi(string(numStrToUse[:]))
+// 		if err != nil {
+// 			fmt.Println(err)
+// 		}
+
+// 		wordsToChangeRange := findNwordsBefore(input, upStrRange[0]-1, numToUse)
+
+// 		for _, wordToChangeRange := range wordsToChangeRange {
+// 			for j := wordToChangeRange[0]; j >= wordToChangeRange[1]; j-- {
+// 				input[j] = byte(unicode.ToUpper(rune(input[j])))
+// 			}
+// 		}
+// 		input = append(input[0:upStrRange[0]-1], input[upStrRange[1]+2:]...)
+
+// 	}
+// 	return input
+// }
