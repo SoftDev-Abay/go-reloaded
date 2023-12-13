@@ -61,7 +61,7 @@ func correctQuotationsMatch(s string, match []int) string {
 }
 
 func quotationsCorrect(s string) string {
-	pattern := `(?i)'(\s+)([^\s]+.*[^\s]+)(\s+)'`
+	pattern := `'(\s*)([^\s]+.*[^\s]+)(\s*)'`
 	comp := regexp.MustCompile(pattern)
 
 	countAllQuotations := len(comp.FindAllString(s, -1))
