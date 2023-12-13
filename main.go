@@ -14,6 +14,7 @@ import (
 )
 
 func main() {
+
 	args := os.Args[1:]
 	for i := 0; i < len(args); i++ {
 		fmt.Println(args[i])
@@ -60,7 +61,7 @@ func correctQuotationsMatch(s string, match []int) string {
 }
 
 func quotationsCorrect(s string) string {
-	pattern := `'(\s+)([^\s]+.*[^\s]+)(\s+)'`
+	pattern := `(?i)'(\s+)([^\s]+.*[^\s]+)(\s+)'`
 	comp := regexp.MustCompile(pattern)
 
 	countAllQuotations := len(comp.FindAllString(s, -1))
@@ -187,7 +188,7 @@ func toCaseMatch(matches []int, s string, toCase func(string) string, n int) str
 	// fmt.Println("strBeforeCommand", strBeforeCommand)
 	// fmt.Println("strAfterCommand", strAfterCommand)
 
-	pattern := `\b((([a-zA-Z\d]+)))` // matches words that may or may not have numbers in it
+	pattern := `[\p{L}\p{M}\d]+` // matches words that may or may not have numbers in it
 	compWords := regexp.MustCompile(pattern)
 	matchesWordsBefore := compWords.FindAllStringSubmatchIndex(strBeforeCommand, -1)
 	changedWordsStr := ""
