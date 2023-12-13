@@ -187,6 +187,11 @@ func toCaseMatch(matches []int, s string, toCase func(string) string, n int) str
 
 	countMatchesWordsBefore := len(matchesWordsBefore)
 
+	if countMatchesWordsBefore == 0 {
+		s = strBeforeCommand + strAfterCommand
+		return s
+	}
+
 	if n > countMatchesWordsBefore {
 		n = countMatchesWordsBefore
 	}
@@ -197,15 +202,23 @@ func toCaseMatch(matches []int, s string, toCase func(string) string, n int) str
 		wordToCase := toCase(wordToChange)
 
 		strBeforePrevWord := s[matchesWordsBefore[i-1][len(matchesWordsBefore[i-1])-1]:matchesWordsBefore[i][0]]
+
+		// strAfterCurrentWord := s[matchesWordsBefore[i][2]:matchesWordsBefore[i][0]]
 		changedWordsStr = strBeforePrevWord + wordToCase + changedWordsStr
 	}
 
 	indexFirstWordToChange := countMatchesWordsBefore - 1 - n
+	strBeforeLastWordAndCommand := s[matchesWordsBefore[countMatchesWordsBefore-1][1]:matches[0]]
 
-	if indexFirstWordToChange <= 0 {
+	if indexFirstWordToChange < 0 {
+		fmt.Println("if one ")
 		missedFirstWord := s[matchesWordsBefore[0][0]:matchesWordsBefore[0][1]]
 		missedFirstWordToCase := toCase(missedFirstWord)
-		s = s[:matchesWordsBefore[0][0]] + missedFirstWordToCase + changedWordsStr + strAfterCommand
+		s = s[:matchesWordsBefore[0][0]] + missedFirstWordToCase + changedWordsStr + strBeforeLastWordAndCommand + strAfterCommand
+		return s
+	} else if indexFirstWordToChange == 0 {
+		fmt.Println("if twi ")
+		s = s[:matchesWordsBefore[indexFirstWordToChange][0]] + changedWordsStr + strBeforeLastWordAndCommand + strAfterCommand
 		return s
 	}
 
@@ -214,7 +227,7 @@ func toCaseMatch(matches []int, s string, toCase func(string) string, n int) str
 	strBeforeChangedWords := s[:matchesWordsBefore[indexFirstWordToChange][lenOfFirstWordToChange-1]]
 	// lastChangedWordIndexs := matchesWordsBefore[len(matchesWordsBefore)-1][len(matchesWordsBefore[len(matchesWordsBefore)-1])-1]
 
-	s = strBeforeChangedWords + changedWordsStr + strAfterCommand
+	s = strBeforeChangedWords + changedWordsStr + strBeforeLastWordAndCommand + strAfterCommand
 	return s
 }
 
