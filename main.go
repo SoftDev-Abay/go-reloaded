@@ -27,15 +27,12 @@ func main() {
 
 	strInput = hex(strInput)
 	strInput = bin(strInput)
-	strInput = CaseCommandInvoker(strInput, "up")
-	strInput = CaseCommandInvoker(strInput, "low")
-	strInput = CaseCommandInvoker(strInput, "cap")
+
+	strInput = CaseAllCommand(strInput)
+
 	strInput = articleACorrect(strInput)
 	strInput = punctuationCorrect(strInput)
 	strInput = quotationsCorrect(strInput)
-
-	// reUp := regexp.MustCompile(` (\((up|low|bin|hex|cap)\)) | (\((up|low|bin|hex|cap), \d{1,8}\))`)
-	// strInput = reUp.ReplaceAllString(strInput, "")
 
 	inputByte = []byte(strInput)
 
@@ -104,8 +101,9 @@ func correctPunctuationMatch(s string, match []int) string {
 	separator := ""
 
 	// fmt.Println(string(s[match[3]]))
+	if match[3] > len(s)-1 { // check if after shifting charachter after punctuation is the end
 
-	if string(s[match[3]]) != " " {
+	} else if string(s[match[3]]) != " " {
 		separator = " "
 	}
 
@@ -137,40 +135,45 @@ func correctArticleMatch(s string, match []int) string {
 	return s
 }
 
-func CaseCommandInvoker(s string, commandName string) string {
-	newS := s
+func getCaseFunction(commandName string) func(string) string {
+	caseTo := strings.ToUpper
 	switch commandName {
 	case "up":
-		newS = CaseCommand(s, commandName, strings.ToUpper)
+		caseTo = strings.ToUpper
 	case "low":
-		newS = CaseCommand(s, commandName, strings.ToLower)
+		caseTo = strings.ToLower
 	case "cap":
 		caser := cases.Title(language.English)
-		newS = CaseCommand(s, commandName, caser.String)
+		caseTo = caser.String
 	}
-	return newS
+	return caseTo
 }
 
-func CaseCommand(s string, commandName string, toCase func(string) string) string {
-	patternUpMultipule := fmt.Sprintf(`(\(%s, \d{1,8}\))|(\(%s\))`, commandName, commandName)
+func CaseAllCommand(s string) string {
+	patternUpMultipule := `\((up|low|cap)(, (\d{1,8}))?\)`
 	compPatUpMultipule := regexp.MustCompile(patternUpMultipule)
+
 	countUpMultipule := len(compPatUpMultipule.FindAllString(s, -1))
-	commandNameLen := len(commandName)
 
 	for i := 0; i < countUpMultipule; i++ {
 		match := compPatUpMultipule.FindStringSubmatchIndex(s)
+		commandName := s[match[2]:match[3]]
+		toCase := getCaseFunction(commandName)
 
-		if match[1]-match[0] == 2+commandNameLen {
+		if match[4] == -1 { // doenst have a number
+
+			// run FuncTOCaseMatchOne - ex (cap)
 			s = toCaseMatch(match, s, toCase, 1)
-		} else {
 
-			numberToUpStr := s[match[0]+commandNameLen+3 : match[1]-1]
-			numberToUpInt, err := strconv.Atoi(numberToUpStr)
+		} else { // has a number
+
+			strNum := s[match[6]:match[7]]
+			strNumInt, err := strconv.Atoi(strNum)
+
 			if err != nil {
 				fmt.Println(err)
 			}
-
-			s = toCaseMatch(match, s, toCase, numberToUpInt)
+			s = toCaseMatch(match, s, toCase, strNumInt)
 		}
 	}
 
@@ -180,7 +183,11 @@ func CaseCommand(s string, commandName string, toCase func(string) string) strin
 func toCaseMatch(matches []int, s string, toCase func(string) string, n int) string {
 	strBeforeCommand := s[:matches[0]]
 	strAfterCommand := s[matches[1]:]
-	pattern := `\b((([a-zA-Z]+)))`
+
+	// fmt.Println("strBeforeCommand", strBeforeCommand)
+	// fmt.Println("strAfterCommand", strAfterCommand)
+
+	pattern := `\b((([a-zA-Z\d]+)))` // matches words that may or may not have numbers in it
 	compWords := regexp.MustCompile(pattern)
 	matchesWordsBefore := compWords.FindAllStringSubmatchIndex(strBeforeCommand, -1)
 	changedWordsStr := ""
@@ -197,13 +204,20 @@ func toCaseMatch(matches []int, s string, toCase func(string) string, n int) str
 	}
 
 	for i := len(matchesWordsBefore) - 1; i > 0 && i > len(matchesWordsBefore)-1-n; i-- {
+
 		wordLen := len(matchesWordsBefore[i])
 		wordToChange := s[matchesWordsBefore[i][0]:matchesWordsBefore[i][wordLen-1]]
+
 		wordToCase := toCase(wordToChange)
 
 		strBeforePrevWord := s[matchesWordsBefore[i-1][len(matchesWordsBefore[i-1])-1]:matchesWordsBefore[i][0]]
 
-		// strAfterCurrentWord := s[matchesWordsBefore[i][2]:matchesWordsBefore[i][0]]
+		// check if word is fully numeric
+
+		// if IsNumeric(wordToChange) {
+		// 	wordToCase = wordToChange
+		// }
+
 		changedWordsStr = strBeforePrevWord + wordToCase + changedWordsStr
 	}
 
@@ -211,13 +225,11 @@ func toCaseMatch(matches []int, s string, toCase func(string) string, n int) str
 	strBeforeLastWordAndCommand := s[matchesWordsBefore[countMatchesWordsBefore-1][1]:matches[0]]
 
 	if indexFirstWordToChange < 0 {
-		fmt.Println("if one ")
 		missedFirstWord := s[matchesWordsBefore[0][0]:matchesWordsBefore[0][1]]
 		missedFirstWordToCase := toCase(missedFirstWord)
 		s = s[:matchesWordsBefore[0][0]] + missedFirstWordToCase + changedWordsStr + strBeforeLastWordAndCommand + strAfterCommand
 		return s
 	} else if indexFirstWordToChange == 0 {
-		fmt.Println("if twi ")
 		s = s[:matchesWordsBefore[indexFirstWordToChange][0]] + changedWordsStr + strBeforeLastWordAndCommand + strAfterCommand
 		return s
 	}

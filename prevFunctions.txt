@@ -1,3 +1,54 @@
+func IsNumeric(s string) bool {
+	for _, r := range s {
+		if !(r >= '0' && r <= '9') {
+			return false
+		}
+	}
+	return true
+}
+
+
+func CaseCommandInvoker(s string, commandName string) string {
+	newS := s
+	switch commandName {
+	case "up":
+		newS = CaseCommand(s, commandName, strings.ToUpper)
+	case "low":
+		newS = CaseCommand(s, commandName, strings.ToLower)
+	case "cap":
+		caser := cases.Title(language.English)
+		newS = CaseCommand(s, commandName, caser.String)
+	}
+	return newS
+}
+
+
+func CaseCommand(s string, commandName string, toCase func(string) string) string {
+	patternUpMultipule := fmt.Sprintf(`(\(%s, \d{1,8}\))|(\(%s\))`, commandName, commandName)
+	compPatUpMultipule := regexp.MustCompile(patternUpMultipule)
+	countUpMultipule := len(compPatUpMultipule.FindAllString(s, -1))
+	commandNameLen := len(commandName)
+
+	for i := 0; i < countUpMultipule; i++ {
+		match := compPatUpMultipule.FindStringSubmatchIndex(s)
+
+		if match[1]-match[0] == 2+commandNameLen {
+			s = toCaseMatch(match, s, toCase, 1)
+		} else {
+
+			numberToUpStr := s[match[0]+commandNameLen+3 : match[1]-1]
+			numberToUpInt, err := strconv.Atoi(numberToUpStr)
+			if err != nil {
+				fmt.Println(err)
+			}
+
+			s = toCaseMatch(match, s, toCase, numberToUpInt)
+		}
+	}
+
+	return s
+}
+
 func reverseBytes(bytes []byte) {
 	for i, j := 0, len(bytes)-1; i < j; i, j = i+1, j-1 {
 		bytes[i], bytes[j] = bytes[j], bytes[i]
