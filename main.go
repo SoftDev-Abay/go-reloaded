@@ -86,7 +86,7 @@ func punctuationCorrect(s string) string {
 	comp := regexp.MustCompile(pattern)
 	countMisplacedPunct := len(comp.FindAllString(s, -1))
 
-	for i := 0; i < countMisplacedPunct; i++ {
+	for i := 0; i <= countMisplacedPunct; i++ {
 		match := comp.FindStringSubmatchIndex(s)
 
 		s = correctPunctuationMatch(s, match)
@@ -102,7 +102,6 @@ func correctPunctuationMatch(s string, match []int) string {
 
 	// fmt.Println(string(s[match[3]]))
 	if match[3] > len(s)-1 { // check if after shifting charachter after punctuation is the end
-
 	} else if string(s[match[3]]) != " " {
 		separator = " "
 	}
@@ -164,12 +163,10 @@ func CaseAllCommand(s string) string {
 
 			// run FuncTOCaseMatchOne - ex (cap)
 			s = toCaseMatch(match, s, toCase, 1)
-
 		} else { // has a number
 
 			strNum := s[match[6]:match[7]]
 			strNumInt, err := strconv.Atoi(strNum)
-
 			if err != nil {
 				fmt.Println(err)
 			}
@@ -181,8 +178,8 @@ func CaseAllCommand(s string) string {
 }
 
 func toCaseMatch(matches []int, s string, toCase func(string) string, n int) string {
-	strBeforeCommand := s[:matches[0]]
-	strAfterCommand := s[matches[1]:]
+	strBeforeCommand := s[:matches[0]-1]
+	strAfterCommand := s[matches[1]+1:]
 
 	// fmt.Println("strBeforeCommand", strBeforeCommand)
 	// fmt.Println("strAfterCommand", strAfterCommand)
@@ -284,7 +281,7 @@ func hex(s string) string {
 }
 
 func bin(s string) string {
-	pattern := `\b([0-9A-Fa-f]+)\s*[\?!.,:;\(]*\s*\((bin)\)`
+	pattern := `\b([01]+)\s*[\?!.,:;\(]*\s*\((bin)\)`
 	compPat := regexp.MustCompile(pattern)
 	countHex := len(compPat.FindAllString(s, -1))
 
@@ -296,7 +293,7 @@ func bin(s string) string {
 
 	// delete all "(hex)" indicatord
 
-	patternHexes := `\((hex)\)`
+	patternHexes := `\((bin)\)`
 	patternHexesRX := regexp.MustCompile(patternHexes)
 	s = patternHexesRX.ReplaceAllString(s, "")
 
