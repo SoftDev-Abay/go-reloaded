@@ -43,42 +43,46 @@ func main() {
 	}
 }
 
-func correctQuotationsMatch(s string, match []int) string {
-	// wholeMatchStr := s[match[0]:match[1]] // all match
+func correctQuotationsMatch(s string, match []int) (string, int) {
+	// Extract the sentence between quotes
+	sentenceUnformatted := s[match[2]:match[3]]
+	sentenceFormatted := strings.TrimSpace(sentenceUnformatted)
 
-	// spaceBeforeSentenceStr := s[match[2]:match[3]] // space before sentence
+	// Calculate the number of spaces removed
+	deletedSpaces := len(sentenceUnformatted) - len(sentenceFormatted)
+	fmt.Println("deletedSpaces", deletedSpaces)
 
-	sentenceStr := s[match[4]:match[5]] // sentence
+	// Replace the original match with the corrected sentence
+	s = s[:match[2]] + sentenceFormatted + s[match[3]:]
 
-	// spaceAfterSentenceStr :=  s[match[6]:match[7]] // space after sentence
-
-	strBeforeMatch := s[:match[0]]
-	strAfterMatch := s[match[1]:]
-
-	s = strBeforeMatch + "'" + sentenceStr + "'" + strAfterMatch
-
-	return s
+	return s, deletedSpaces
 }
 
 func quotationsCorrect(s string) string {
-	pattern := `'(\s*)([^\s]+.*[^\s]+)(\s*)'`
+	pattern := `'([^']*)'`
 	comp := regexp.MustCompile(pattern)
 
-	countAllQuotations := len(comp.FindAllString(s, -1))
+	matches := comp.FindAllStringSubmatchIndex(s, -1)
 
-	for i := 0; i < countAllQuotations; i++ {
-		match := comp.FindStringSubmatchIndex(s)
+	shiftedLeft := 0
 
-		s = correctQuotationsMatch(s, match)
+	for _, match := range matches {
+
+		// Update the indices after removing spaces
+		fmt.Println("match", match)
+
+		for j := 0; j < len(match); j += 1 {
+			match[j] -= shiftedLeft
+		}
+
+		// Correct the match
+		fmt.Println("match", match)
+		spacesRemoved := 0
+		s, spacesRemoved = correctQuotationsMatch(s, match)
+		shiftedLeft += spacesRemoved
 
 	}
 
-	// fmt.Println(match)
-
-	// fmt.Println("1", s[match[0]:match[1]]) // all match
-	// fmt.Println("2", s[match[2]:match[3]]) // space before sentence
-	// fmt.Println("3", s[match[4]:match[5]]) // sentence
-	// fmt.Println("4", s[match[6]:match[7]]) // space after sentence
 	return s
 }
 
@@ -87,7 +91,7 @@ func punctuationCorrect(s string) string {
 	comp := regexp.MustCompile(pattern)
 	countMisplacedPunct := len(comp.FindAllString(s, -1))
 
-	for i := 0; i <= countMisplacedPunct; i++ {
+	for i := 1; i <= countMisplacedPunct; i++ {
 		match := comp.FindStringSubmatchIndex(s)
 
 		s = correctPunctuationMatch(s, match)
@@ -182,8 +186,8 @@ func toCaseMatch(matches []int, s string, toCase func(string) string, n int) str
 	strBeforeCommand := s[:matches[0]-1]
 	strAfterCommand := s[matches[1]+1:]
 
-	// fmt.Println("strBeforeCommand", strBeforeCommand)
-	// fmt.Println("strAfterCommand", strAfterCommand)
+	fmt.Println("strBeforeCommand", strBeforeCommand)
+	fmt.Println("strAfterCommand", strAfterCommand)
 
 	pattern := `[\p{L}\p{M}\d]+` // matches words that may or may not have numbers in it
 	compWords := regexp.MustCompile(pattern)
@@ -300,3 +304,15 @@ func bin(s string) string {
 
 	return s
 }
+
+// => "30 files were added"
+// => "It has been 2 years"
+// => "Ready, set, GO !"
+// => "I should stop shouting"
+// => "Welcome to the Brooklyn Bridge"
+// => "This is SO EXCITING"
+// => "I was sitting over there, and then BAMM!!"
+// => "I was thinking... You were right"
+// => "I am exactly how they describe me: 'awesome'"
+// => "As Elton John said: 'I am the most well-known homosexual in the world'"
+// => "There it was. An amazing rock!"

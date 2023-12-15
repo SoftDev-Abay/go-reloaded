@@ -1,3 +1,18 @@
+// => "30 files were added"
+// => "It has been 2 years"
+// => "Ready, set, GO !"
+// => "I should stop shouting"
+// => "Welcome to the Brooklyn Bridge"
+// => "This is SO EXCITING"
+// => "I was sitting over there, and then BAMM!!"
+// => "I was thinking... You were right"
+// => "I am exactly how they describe me: 'awesome'"
+// => "As Elton John said: 'I am the most well-known homosexual in the world'"
+// => "There it was. An amazing rock!"
+
+
+|||||||||||||||||||||||||||||||||||||||||||||||
+
 func IsNumeric(s string) bool {
 	for _, r := range s {
 		if !(r >= '0' && r <= '9') {
