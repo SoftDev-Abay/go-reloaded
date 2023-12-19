@@ -15,12 +15,16 @@ import (
 
 func main() {
 	args := os.Args[1:]
-	for i := 0; i < len(args); i++ {
-		fmt.Println(args[i])
+
+	if len(args) != 2 {
+		fmt.Println("Two files accepted, ex: sample.txt result.txt")
+		return
 	}
+
 	inputByte, err := os.ReadFile(args[0])
 	if err != nil {
 		fmt.Println(err)
+		return
 	}
 
 	strInput := string(inputByte[:])
@@ -37,8 +41,14 @@ func main() {
 	inputByte = []byte(strInput)
 
 	err = os.WriteFile(args[1], inputByte, 0)
+
 	if err != nil {
 		fmt.Println(err)
+		return
+	}
+
+	for i := 0; i < len(args); i++ {
+		fmt.Println(args[i])
 	}
 }
 
