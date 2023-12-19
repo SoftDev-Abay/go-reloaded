@@ -128,7 +128,6 @@ func articleACorrect(s string) string {
 func correctArticleMatch(s string, match []int) string {
 	strBeforeArticle := s[:match[4]-1]
 	article := s[match[2]:match[3]]
-	fmt.Println(s[match[2]:match[3]])
 
 	strCorrectArticle := "an"
 
@@ -156,7 +155,7 @@ func getCaseFunction(commandName string) func(string) string {
 }
 
 func CaseAllCommand(s string) string {
-	patternUpMultipule := `\((up|low|cap)(, (\d{1,8}))?\)`
+	patternUpMultipule := `\((up|low|cap)(, (\d{1,20}))?\)`
 	compPatUpMultipule := regexp.MustCompile(patternUpMultipule)
 
 	countUpMultipule := len(compPatUpMultipule.FindAllString(s, -1))
@@ -179,6 +178,10 @@ func CaseAllCommand(s string) string {
 			s = toCaseMatch(match, s, toCase, strNumInt)
 		}
 	}
+
+	patternToDelete := `\((up|low|cap)(, (\d+))?\)`
+	compPatToDelete := regexp.MustCompile(patternToDelete)
+	s = compPatToDelete.ReplaceAllString(s, "")
 
 	return s
 }
