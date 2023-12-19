@@ -14,7 +14,6 @@ import (
 )
 
 func main() {
-
 	args := os.Args[1:]
 	for i := 0; i < len(args); i++ {
 		fmt.Println(args[i])
@@ -50,7 +49,6 @@ func correctQuotationsMatch(s string, match []int) (string, int) {
 
 	// Calculate the number of spaces removed
 	deletedSpaces := len(sentenceUnformatted) - len(sentenceFormatted)
-	fmt.Println("deletedSpaces", deletedSpaces)
 
 	// Replace the original match with the corrected sentence
 	s = s[:match[2]] + sentenceFormatted + s[match[3]:]
@@ -69,14 +67,12 @@ func quotationsCorrect(s string) string {
 	for _, match := range matches {
 
 		// Update the indices after removing spaces
-		fmt.Println("match", match)
 
 		for j := 0; j < len(match); j += 1 {
 			match[j] -= shiftedLeft
 		}
 
 		// Correct the match
-		fmt.Println("match", match)
 		spacesRemoved := 0
 		s, spacesRemoved = correctQuotationsMatch(s, match)
 		shiftedLeft += spacesRemoved
@@ -95,7 +91,6 @@ func punctuationCorrect(s string) string {
 		match := comp.FindStringSubmatchIndex(s)
 
 		s = correctPunctuationMatch(s, match)
-		// fmt.Println(correctedS)
 	}
 	return s
 }
@@ -105,7 +100,6 @@ func correctPunctuationMatch(s string, match []int) string {
 	strBeforePunctuation := s[:match[0]]
 	separator := ""
 
-	// fmt.Println(string(s[match[3]]))
 	if match[3] > len(s)-1 { // check if after shifting charachter after punctuation is the end
 	} else if string(s[match[3]]) != " " {
 		separator = " "
@@ -118,7 +112,7 @@ func correctPunctuationMatch(s string, match []int) string {
 }
 
 func articleACorrect(s string) string {
-	pattern := `\b\s+([a])(\s+[\?!.,:;\(]*\s*[aeiouh][a-zA-Z]+)`
+	pattern := `\b([aA])(\s+[\?!.,:;\(]*\s*[aeiouh][a-zA-Z]+)`
 	comp := regexp.MustCompile(pattern)
 	countIncorrectArticleMatches := len(comp.FindAllString(s, -1))
 
@@ -133,7 +127,15 @@ func articleACorrect(s string) string {
 
 func correctArticleMatch(s string, match []int) string {
 	strBeforeArticle := s[:match[4]-1]
+	article := s[match[2]:match[3]]
+	fmt.Println(s[match[2]:match[3]])
+
 	strCorrectArticle := "an"
+
+	if article == "A" {
+		strCorrectArticle = "An"
+	}
+
 	strAfterArticle := s[match[4]:]
 	s = strBeforeArticle + strCorrectArticle + strAfterArticle
 	return s
@@ -166,7 +168,6 @@ func CaseAllCommand(s string) string {
 
 		if match[4] == -1 { // doenst have a number
 
-			// run FuncTOCaseMatchOne - ex (cap)
 			s = toCaseMatch(match, s, toCase, 1)
 		} else { // has a number
 
@@ -188,9 +189,6 @@ func toCaseMatch(matches []int, s string, toCase func(string) string, n int) str
 	if matches[1] < len(s)-1 {
 		strAfterCommand = s[matches[1]+1:]
 	}
-
-	fmt.Println("strBeforeCommand", strBeforeCommand)
-	fmt.Println("strAfterCommand", strAfterCommand)
 
 	pattern := `[\p{L}\p{M}\d]+` // matches words that may or may not have numbers in it
 	compWords := regexp.MustCompile(pattern)
@@ -216,12 +214,6 @@ func toCaseMatch(matches []int, s string, toCase func(string) string, n int) str
 		wordToCase := toCase(wordToChange)
 
 		strBeforePrevWord := s[matchesWordsBefore[i-1][len(matchesWordsBefore[i-1])-1]:matchesWordsBefore[i][0]]
-
-		// check if word is fully numeric
-
-		// if IsNumeric(wordToChange) {
-		// 	wordToCase = wordToChange
-		// }
 
 		changedWordsStr = strBeforePrevWord + wordToCase + changedWordsStr
 	}
@@ -275,7 +267,6 @@ func hex(s string) string {
 
 	for i := 0; i < countHex; i++ {
 		match := compPat.FindStringSubmatchIndex(s)
-		// fmt.Println(match)
 		s = toDecimal(match, s, 16)
 	}
 
@@ -295,7 +286,6 @@ func bin(s string) string {
 
 	for i := 0; i < countHex; i++ {
 		match := compPat.FindStringSubmatchIndex(s)
-		// fmt.Println(match)
 		s = toDecimal(match, s, 2)
 	}
 
@@ -307,15 +297,3 @@ func bin(s string) string {
 
 	return s
 }
-
-// => "30 files were added"
-// => "It has been 2 years"
-// => "Ready, set, GO !"
-// => "I should stop shouting"
-// => "Welcome to the Brooklyn Bridge"
-// => "This is SO EXCITING"
-// => "I was sitting over there, and then BAMM!!"
-// => "I was thinking... You were right"
-// => "I am exactly how they describe me: 'awesome'"
-// => "As Elton John said: 'I am the most well-known homosexual in the world'"
-// => "There it was. An amazing rock!"
