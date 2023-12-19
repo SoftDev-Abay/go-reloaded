@@ -184,7 +184,10 @@ func CaseAllCommand(s string) string {
 
 func toCaseMatch(matches []int, s string, toCase func(string) string, n int) string {
 	strBeforeCommand := s[:matches[0]-1]
-	strAfterCommand := s[matches[1]+1:]
+	strAfterCommand := s[matches[1]:]
+	if matches[1] < len(s)-1 {
+		strAfterCommand = s[matches[1]+1:]
+	}
 
 	fmt.Println("strBeforeCommand", strBeforeCommand)
 	fmt.Println("strAfterCommand", strAfterCommand)
