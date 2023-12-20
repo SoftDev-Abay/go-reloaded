@@ -24,14 +24,7 @@ func main() {
 
 	strInput := string(inputByte[:])
 
-	strInput = hex(strInput)
-	strInput = bin(strInput)
-
-	strInput = CaseAllCommand(strInput)
-
-	strInput = articleACorrect(strInput)
-	strInput = punctuationCorrect(strInput)
-	strInput = quotationsCorrect(strInput)
+	strInput = FormatText(strInput)
 
 	inputByte = []byte(strInput)
 
@@ -45,6 +38,16 @@ func main() {
 	for i := 0; i < len(args); i++ {
 		fmt.Println(args[i])
 	}
+}
+
+func FormatText(s string) string {
+	s = hex(s)
+	s = bin(s)
+	s = CaseAllCommand(s)
+	s = articleACorrect(s)
+	s = punctuationCorrect(s)
+	s = quotationsCorrect(s)
+	return s
 }
 
 func correctQuotationsMatch(s string, match []int) (string, int) {
@@ -255,6 +258,7 @@ func toCaseMatch(matches []int, s string, toCase func(string) string, n int) str
 	}
 
 	if n > countMatchesWordsBefore {
+
 		n = countMatchesWordsBefore
 	}
 
@@ -279,7 +283,10 @@ func toCaseMatch(matches []int, s string, toCase func(string) string, n int) str
 		s = s[:matchesWordsBefore[0][0]] + missedFirstWordToCase + changedWordsStr + strBeforeLastWordAndCommand + strAfterCommand
 		return s
 	} else if indexFirstWordToChange == 0 {
-		s = s[:matchesWordsBefore[indexFirstWordToChange][0]] + changedWordsStr + strBeforeLastWordAndCommand + strAfterCommand
+		missedFirstWord := s[matchesWordsBefore[0][0]:matchesWordsBefore[0][1]]
+		missedFirstWordToCase := toCase(strings.ToLower(missedFirstWord))
+
+		s = s[:matchesWordsBefore[indexFirstWordToChange][0]] + missedFirstWordToCase + changedWordsStr + strBeforeLastWordAndCommand + strAfterCommand
 		return s
 	}
 
@@ -289,6 +296,9 @@ func toCaseMatch(matches []int, s string, toCase func(string) string, n int) str
 	// lastChangedWordIndexs := matchesWordsBefore[len(matchesWordsBefore)-1][len(matchesWordsBefore[len(matchesWordsBefore)-1])-1]
 
 	s = strBeforeChangedWords + changedWordsStr + strBeforeLastWordAndCommand + strAfterCommand
+
+	// fmt.Println(strBeforeChangedWords)
+
 	return s
 }
 
