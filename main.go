@@ -95,12 +95,14 @@ func quotationsCorrect(s string) string {
 func punctuationCorrect(s string) string {
 	pattern := `\s+(\.{3}|!\?|[\?!.,:;])(\s*[a-zA-Z]*)`
 	comp := regexp.MustCompile(pattern)
-	countMisplacedPunct := len(comp.FindAllString(s, -1))
 
-	for i := 1; i <= countMisplacedPunct; i++ {
-		match := comp.FindStringSubmatchIndex(s)
+	match := comp.FindStringSubmatchIndex(s)
+
+	for len(match) > 1 {
 
 		s = correctPunctuationMatch(s, match)
+
+		match = comp.FindStringSubmatchIndex(s)
 	}
 	return s
 }
