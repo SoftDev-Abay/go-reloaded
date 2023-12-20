@@ -6,11 +6,6 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
-
-	"golang.org/x/text/cases"
-	"golang.org/x/text/language"
-	// "honnef.co/go/tools/pattern"
-	// "utils"
 )
 
 func main() {
@@ -67,6 +62,18 @@ func correctQuotationsMatch(s string, match []int) (string, int) {
 }
 
 func quotationsCorrect(s string) string {
+	appostReplacement := "zAdWtf6wqT"
+
+	patternAppost := `(\s*)(')(\s*(t|m|ll|ve|re|s|d)\s+)`
+
+	compAppost := regexp.MustCompile(patternAppost)
+
+	s = compAppost.ReplaceAllStringFunc(s, func(match string) string {
+		matchAppostComp := regexp.MustCompile(`'`)
+		result := matchAppostComp.ReplaceAllString(match, appostReplacement)
+		return result
+	})
+
 	pattern := `'([^']*)'`
 	comp := regexp.MustCompile(pattern)
 
@@ -88,6 +95,10 @@ func quotationsCorrect(s string) string {
 		shiftedLeft += spacesRemoved
 
 	}
+
+	compAppost = regexp.MustCompile(appostReplacement)
+
+	s = compAppost.ReplaceAllString(s, "'")
 
 	return s
 }
@@ -187,8 +198,7 @@ func getCaseFunction(commandName string) func(string) string {
 	case "low":
 		caseTo = strings.ToLower
 	case "cap":
-		caser := cases.Title(language.English)
-		caseTo = caser.String
+		caseTo = strings.Title
 	}
 	return caseTo
 }
@@ -253,7 +263,7 @@ func toCaseMatch(matches []int, s string, toCase func(string) string, n int) str
 		wordLen := len(matchesWordsBefore[i])
 		wordToChange := s[matchesWordsBefore[i][0]:matchesWordsBefore[i][wordLen-1]]
 
-		wordToCase := toCase(wordToChange)
+		wordToCase := toCase(strings.ToLower(wordToChange))
 
 		strBeforePrevWord := s[matchesWordsBefore[i-1][len(matchesWordsBefore[i-1])-1]:matchesWordsBefore[i][0]]
 
@@ -265,7 +275,7 @@ func toCaseMatch(matches []int, s string, toCase func(string) string, n int) str
 
 	if indexFirstWordToChange < 0 {
 		missedFirstWord := s[matchesWordsBefore[0][0]:matchesWordsBefore[0][1]]
-		missedFirstWordToCase := toCase(missedFirstWord)
+		missedFirstWordToCase := toCase(strings.ToLower(missedFirstWord))
 		s = s[:matchesWordsBefore[0][0]] + missedFirstWordToCase + changedWordsStr + strBeforeLastWordAndCommand + strAfterCommand
 		return s
 	} else if indexFirstWordToChange == 0 {
