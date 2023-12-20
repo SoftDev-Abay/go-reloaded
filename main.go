@@ -124,8 +124,8 @@ func correctPunctuationMatch(s string, match []int) string {
 }
 
 func articleACorrect(s string) string {
-	pattern := `\b([aA])(\s+[\?!.,:;\(]*\s*[aeiouh][a-zA-Z]+)`
-	comp := regexp.MustCompile(pattern)
+	patternA := `\b([aA])(\s+[\?!.,:;\(]*\s*[AEIOUHaeiouh][a-zA-Z]+)`
+	comp := regexp.MustCompile(patternA)
 	countIncorrectArticleMatches := len(comp.FindAllString(s, -1))
 
 	for i := 0; i < countIncorrectArticleMatches; i++ {
@@ -134,17 +134,44 @@ func articleACorrect(s string) string {
 		s = correctArticleMatch(s, match)
 
 	}
+
+	patternAn := `\b([aA][nN])(\s+[\?!.,:;\(]*\s*[bcdfghjklmnpqrstvwxyzBCDFGHJKLMNPQRSTVWXYZ][a-zA-Z]+)`
+	comp = regexp.MustCompile(patternAn)
+	countIncorrectArticleMatches = len(comp.FindAllString(s, -1))
+
+	for i := 0; i < countIncorrectArticleMatches; i++ {
+		match := comp.FindStringSubmatchIndex(s)
+
+		s = correctArticleMatch(s, match)
+
+	}
+
 	return s
 }
 
 func correctArticleMatch(s string, match []int) string {
 	strBeforeArticle := s[:match[4]-1]
-	article := s[match[2]:match[3]]
 
-	strCorrectArticle := "an"
+	sizeArticle := match[3] - match[2] - 1
 
-	if article == "A" {
+	article := s[match[2] : match[3]+sizeArticle]
+
+	fmt.Println("match", match)
+	fmt.Println("strBeforeArticle", strBeforeArticle)
+
+	strCorrectArticle := ""
+
+	switch article {
+	case "A":
 		strCorrectArticle = "An"
+	case "a":
+		strCorrectArticle = "an"
+	case "An":
+		strCorrectArticle = "A"
+	case "AN":
+		strCorrectArticle = "A"
+	case "an":
+		strCorrectArticle = "a"
 	}
 
 	strAfterArticle := s[match[4]:]
