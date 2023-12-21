@@ -257,13 +257,13 @@ func getCaseFunction(commandName string) func(string) string {
 }
 
 func CaseAllCommand(s string) string {
-	patternUpMultipule := `\((up|low|cap)(, (\d{1,20}))?\)`
+	patternUpMultipule := `\(\s*(up|low|cap)\s*(\s*,\s*(\d{1,20})\s*)?\)`
 	compPatUpMultipule := regexp.MustCompile(patternUpMultipule)
 
-	countUpMultipule := len(compPatUpMultipule.FindAllString(s, -1))
+	match := compPatUpMultipule.FindStringSubmatchIndex(s)
 
-	for i := 0; i < countUpMultipule; i++ {
-		match := compPatUpMultipule.FindStringSubmatchIndex(s)
+	for len(match) > 0 {
+
 		commandName := s[match[2]:match[3]]
 		toCase := getCaseFunction(commandName)
 
@@ -279,9 +279,10 @@ func CaseAllCommand(s string) string {
 			}
 			s = toCaseMatch(match, s, toCase, strNumInt)
 		}
+		match = compPatUpMultipule.FindStringSubmatchIndex(s)
 	}
 
-	patternToDelete := `\((up|low|cap)(, ([-+]*\d+))?\)`
+	patternToDelete := `\(\s*(up|low|cap)\s*(\s*,\s*([-+]*\d{1,20})\s*)?\)`
 	compPatToDelete := regexp.MustCompile(patternToDelete)
 	s = compPatToDelete.ReplaceAllString(s, "")
 
