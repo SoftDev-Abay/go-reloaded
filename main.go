@@ -15,7 +15,7 @@ func main() {
 		fmt.Println("Two files accepted, ex: sample.txt result.txt")
 		return
 	}
- /// txt
+	/// txt
 	inputByte, err := os.ReadFile(args[0])
 	if err != nil {
 		fmt.Println(err)
@@ -162,25 +162,28 @@ func correctPunctuationMatch(s string, match []int) string {
 }
 
 func articleACorrect(s string) string {
-	patternA := `\b([aA])(\s+[\?!.,:;\(]*\s*[AEIOUHaeiouh][a-zA-Z]+)` // to include not only words but also sing charachters change + to *
+	patternA := `\b([aA])(\s+[\?!.,:;\(]*\s*[AEIOUHaeiouh][a-zA-Z]*)` // to include not only words but also sing charachters change + to *
 	comp := regexp.MustCompile(patternA)
-	countIncorrectArticleMatches := len(comp.FindAllString(s, -1))
 
-	for i := 0; i < countIncorrectArticleMatches; i++ {
-		match := comp.FindStringSubmatchIndex(s)
+	match := comp.FindStringSubmatchIndex(s)
+
+	for len(match) != 0 {
 
 		s = correctArticleMatch(s, match)
+
+		match = comp.FindStringSubmatchIndex(s)
 
 	}
 
-	patternAn := `\b([aA][nN])(\s+[\?!.,:;\(]*\s*[bcdfghjklmnpqrstvwxyzBCDFGHJKLMNPQRSTVWXYZ][a-zA-Z]+)` // to include not only words but also sing charachters change + to *
+	patternAn := `\b([aA][nN])(\s+[\?!.,:;\(]*\s*[bcdfghjklmnpqrstvwxyzBCDFGHJKLMNPQRSTVWXYZ][a-zA-Z]*)` // to include not only words but also sing charachters change + to *
 	comp = regexp.MustCompile(patternAn)
-	countIncorrectArticleMatches = len(comp.FindAllString(s, -1))
 
-	for i := 0; i < countIncorrectArticleMatches; i++ {
-		match := comp.FindStringSubmatchIndex(s)
+	match = comp.FindStringSubmatchIndex(s)
+
+	for len(match) != 0 {
 
 		s = correctArticleMatch(s, match)
+		match = comp.FindStringSubmatchIndex(s)
 
 	}
 
@@ -193,9 +196,6 @@ func correctArticleMatch(s string, match []int) string {
 	sizeArticle := match[3] - match[2] - 1
 
 	article := s[match[2] : match[3]+sizeArticle]
-
-	fmt.Println("match", match)
-	fmt.Println("strBeforeArticle", strBeforeArticle)
 
 	strCorrectArticle := ""
 
@@ -269,24 +269,20 @@ func toCaseMatch(matches []int, s string, toCase func(string) string, n int) str
 	fmt.Println(strBeforeCommand)
 	fmt.Println(strAfterCommand)
 
-
 	pattern := `[\p{L}\p{M}\d]+` // matches words that may or may not have numbers in it
 	compWords := regexp.MustCompile(pattern)
 	matchesWordsBefore := compWords.FindAllStringSubmatchIndex(strBeforeCommand, -1)
 
-
 	countMatchesWordsBefore := len(matchesWordsBefore)
-
 
 	if n > countMatchesWordsBefore {
 		n = countMatchesWordsBefore
 	}
 
-
-	firstIndexOfFirstWord := matchesWordsBefore[countMatchesWordsBefore - n][0]
+	firstIndexOfFirstWord := matchesWordsBefore[countMatchesWordsBefore-n][0]
 	lastIndexOfLastWord := matchesWordsBefore[countMatchesWordsBefore-1][1]
-	
-	strToChange := s[firstIndexOfFirstWord:lastIndexOfLastWord]  
+
+	strToChange := s[firstIndexOfFirstWord:lastIndexOfLastWord]
 	strToCase := toCase(strings.ToLower(strToChange))
 
 	fmt.Println(strToCase)
@@ -297,18 +293,17 @@ func toCaseMatch(matches []int, s string, toCase func(string) string, n int) str
 		strBeforeCommandAndLastWord = " "
 	}
 
-	fmt.Printf("'%s'",strBeforeCommandAndLastWord)
+	fmt.Printf("'%s'", strBeforeCommandAndLastWord)
 
 	// charBeforeCommad := string(s[matches[0]-1])
 
 	// if charBeforeCommad == " " {
-		
+
 	// }
 
 	// fmt.Printf("'%s'", charBeforeCommad)
 
 	s = s[:firstIndexOfFirstWord] + strToCase + strBeforeCommandAndLastWord + strAfterCommand
-
 
 	return s
 }
