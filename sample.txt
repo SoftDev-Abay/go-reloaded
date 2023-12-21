@@ -1,1 +1,25 @@
-Welcome To The Brooklyn Bridge
+This is an average sentence with some (hex)adecimal numbers like 1F, 7B, and 3D (hex). The (bin)ary numbers include 1010 (bin), 1101 (bin), and 1111 (bin).
+
+Also, there are (up)percase, (low)ercase, and (cap)italized words that need formatting.
+
+Lets test the (up, 2) uppercase command with numbers like 2 and 3. How about testing (low, 1) and (cap, 3) lowercase and capitalized commands?
+
+Now, lets test some punctuation formatting. For instance, we have a few dots ., commas ,, exclamation marks !!, and question marks ??.
+
+We need to ensure that they are properly spaced. Also, we have groups of punctuation like ... and !!?. The program should format them correctly as in the examples.
+
+Lets test the single quotation marks . They should be placed to the right and left of the word in the middle of them without any spaces.
+
+For example, ' Hello ', 'World', and 'Formatting'. If there are more words between the two ' ' marks, the program should place the marks next to the corresponding words.
+
+Like ' This is ' a 'test' for 'quotation marks'.
+
+Now, lets test the (cap)italization of words after an 'a'. For instance, "I saw a apple" should become "I saw an apple".
+
+Similarly, "She bought a historic house" should become "She bought an historic house". The program should handle both vowels and the letter '   h   ' correctly.
+
+Lets test some boundary scenarios with numbers and commands. For example, "(up, 5) This is a long sentence with a command" should capitalize the first five words.
+
+Additionally, "(low, 0) This is a test with a zero command" should not change anything. Lastly, "(bin) 1101 (hex)" should convert the binary and hexadecimal numbers appropriately.
+
+This should provide a comprehensive test for your text formatting tool in Go. Ensure that it handles various scenarios and edge cases effectively.
