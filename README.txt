@@ -1,13 +1,39 @@
 GO-RELOADED
 
-Objectives
+Text Formatting Tool
 
-In this project you will use some of your old functions made in your old repository. You will use them with the objective of making a simple text completion/editing/auto-correction tool.
+This is a simple command-line tool for text formatting in Go. The tool takes two file names as input and formats the content of the first file according to specified rules, then writes the formatted text to the second file.
+Usage
 
-One more detail. This time the project will be corrected by auditors. The auditors will be other students and you will be an auditor as well.
+bash
 
-We advise you to create your own tests for yourself and for when you will correct your auditees.
+go run main.go <input_file> <output_file>
 
+Replace <input_file> with the name of the file you want to format, and <output_file> with the desired name for the formatted output.
+Rules
 
-There are test files inside testdata folder. 
-To start test write: go test
+    The input files must exist, and their extensions must be ".txt".
+
+    The tool performs various text formatting operations, including:
+        Hexadecimal to decimal conversion: (hex) indicator.
+        Binary to decimal conversion: (bin) indicator.
+        Capitalization changes: (up), (low), (cap) indicators.
+        Article "a" corrections: Ensures proper usage of "a" and "an."
+        Punctuation spacing corrections.
+
+    The formatted text is written to the specified output file.
+
+Example
+
+bash
+
+go run main.go input.txt output.txt
+
+Notes
+
+    Make sure to provide the correct file names and extensions.
+    The tool provides information about the processed files.
+
+If you wish to test the program, there are already tests you can run them with
+
+go test
