@@ -15,7 +15,17 @@ func main() {
 		fmt.Println("Two files accepted, ex: sample.txt result.txt")
 		return
 	}
-	/// txt
+
+	if !fileExists(args[0]) || !fileExists(args[1]) {
+		fmt.Println("Files should exist!")
+		return
+	}
+
+	if !fileIsTxt(args[0]) || !fileIsTxt(args[1]) {
+		fmt.Println("Files should be of .txt ext!")
+		return
+	}
+
 	inputByte, err := os.ReadFile(args[0])
 	if err != nil {
 		fmt.Println(err)
@@ -38,6 +48,22 @@ func main() {
 	for i := 0; i < len(args); i++ {
 		fmt.Println(args[i])
 	}
+}
+
+func fileIsTxt(filename string) bool {
+	extension := filename[len(filename)-4:]
+	if extension == ".txt" {
+		return true
+	}
+	return false
+}
+
+func fileExists(filename string) bool {
+	info, err := os.Stat(filename)
+	if os.IsNotExist(err) {
+		return false
+	}
+	return !info.IsDir()
 }
 
 func FormatText(s string) string {
@@ -266,9 +292,6 @@ func toCaseMatch(matches []int, s string, toCase func(string) string, n int) str
 	strBeforeCommand := s[:matches[0]]
 	strAfterCommand := s[matches[1]:]
 
-	fmt.Println(strBeforeCommand)
-	fmt.Println(strAfterCommand)
-
 	pattern := `[\p{L}\p{M}\d]+` // matches words that may or may not have numbers in it
 	compWords := regexp.MustCompile(pattern)
 	matchesWordsBefore := compWords.FindAllStringSubmatchIndex(strBeforeCommand, -1)
@@ -285,23 +308,11 @@ func toCaseMatch(matches []int, s string, toCase func(string) string, n int) str
 	strToChange := s[firstIndexOfFirstWord:lastIndexOfLastWord]
 	strToCase := toCase(strings.ToLower(strToChange))
 
-	fmt.Println(strToCase)
-
 	strBeforeCommandAndLastWord := s[lastIndexOfLastWord:matches[0]]
 
 	if strBeforeCommandAndLastWord == "" {
 		strBeforeCommandAndLastWord = " "
 	}
-
-	fmt.Printf("'%s'", strBeforeCommandAndLastWord)
-
-	// charBeforeCommad := string(s[matches[0]-1])
-
-	// if charBeforeCommad == " " {
-
-	// }
-
-	// fmt.Printf("'%s'", charBeforeCommad)
 
 	s = s[:firstIndexOfFirstWord] + strToCase + strBeforeCommandAndLastWord + strAfterCommand
 
