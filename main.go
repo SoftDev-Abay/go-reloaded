@@ -281,7 +281,7 @@ func CaseAllCommand(s string) string {
 		}
 	}
 
-	patternToDelete := `\((up|low|cap)(, (\d+))?\)`
+	patternToDelete := `\((up|low|cap)(, ([-+]*\d+))?\)`
 	compPatToDelete := regexp.MustCompile(patternToDelete)
 	s = compPatToDelete.ReplaceAllString(s, "")
 
