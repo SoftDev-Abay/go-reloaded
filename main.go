@@ -239,81 +239,44 @@ func CaseAllCommand(s string) string {
 }
 
 func toCaseMatch(matches []int, s string, toCase func(string) string, n int) string {
-	strBeforeCommand := s[:matches[0]-1]
+	strBeforeCommand := s[:matches[0]]
 	strAfterCommand := s[matches[1]:]
-	if matches[1] < len(s)-1 {
-		strAfterCommand = s[matches[1]+1:]
-	}
+
+	fmt.Println(strBeforeCommand)
+	fmt.Println(strAfterCommand)
+
 
 	pattern := `[\p{L}\p{M}\d]+` // matches words that may or may not have numbers in it
 	compWords := regexp.MustCompile(pattern)
 	matchesWordsBefore := compWords.FindAllStringSubmatchIndex(strBeforeCommand, -1)
-	changedWordsStr := ""
+
 
 	countMatchesWordsBefore := len(matchesWordsBefore)
 
-	if countMatchesWordsBefore == 0 {
-		s = strBeforeCommand + strAfterCommand
-		return s
-	}
 
 	if n > countMatchesWordsBefore {
-
 		n = countMatchesWordsBefore
 	}
 
-	for i := len(matchesWordsBefore) - 1; i > 0 && i > len(matchesWordsBefore)-1-n; i-- {
 
-		wordLen := len(matchesWordsBefore[i])
-		wordToChange := s[matchesWordsBefore[i][0]:matchesWordsBefore[i][wordLen-1]]
+	firstIndexOfFirstWord := matchesWordsBefore[countMatchesWordsBefore - n][0]
+	lastIndexOfLastWord := matchesWordsBefore[countMatchesWordsBefore-1][1]
+	
+	strToChange := s[firstIndexOfFirstWord:lastIndexOfLastWord]  
+	strToCase := toCase(strings.ToLower(strToChange))
 
-		wordToCase := toCase(strings.ToLower(wordToChange))
+	fmt.Println(strToCase)
 
-		strBeforePrevWord := s[matchesWordsBefore[i-1][len(matchesWordsBefore[i-1])-1]:matchesWordsBefore[i][0]]
+	strBeforeCommandAndLastWord := s[lastIndexOfLastWord:matches[0]]
 
-		changedWordsStr = strBeforePrevWord + wordToCase + changedWordsStr
+	if strBeforeCommandAndLastWord == "" {
+		strBeforeCommandAndLastWord = " "
 	}
 
-	indexFirstWordToChange := countMatchesWordsBefore - 1 - n
-	strBeforeLastWordAndCommand := s[matchesWordsBefore[countMatchesWordsBefore-1][1]:matches[0]]
+	fmt.Printf("'%s'",strBeforeCommandAndLastWord)
 
-	if strBeforeLastWordAndCommand == " " {
-		strBeforeLastWordAndCommand = ""
-	}
+	s = s[:firstIndexOfFirstWord] + strToCase + strBeforeCommandAndLastWord + strAfterCommand
 
-	if indexFirstWordToChange < 0 {
-		missedFirstWord := s[matchesWordsBefore[0][0]:matchesWordsBefore[0][1]]
-		missedFirstWordToCase := toCase(strings.ToLower(missedFirstWord))
-		s = s[:matchesWordsBefore[0][0]] + missedFirstWordToCase + changedWordsStr + strBeforeLastWordAndCommand + strAfterCommand
-
-		// fmt.Printf("s[:matchesWordsBefore[0][0]]: `%s`\n", s[:matchesWordsBefore[0][0]])
-		// fmt.Printf("missedFirstWordToCase: `%s`\n", missedFirstWordToCase)
-		// fmt.Printf("changedWordsStr: `%s`\n", changedWordsStr)
-		// fmt.Printf("strBeforeLastWordAndCommand: `%s`\n", strBeforeLastWordAndCommand)
-		// fmt.Printf("strAfterCommand: `%s`\n", strAfterCommand)
-
-		// fmt.Println("worked 1")
-		return s
-	} else if indexFirstWordToChange == 0 {
-		missedFirstWord := s[matchesWordsBefore[0][0]:matchesWordsBefore[0][1]]
-		missedFirstWordToCase := toCase(strings.ToLower(missedFirstWord))
-
-		s = s[:matchesWordsBefore[indexFirstWordToChange][0]] + missedFirstWordToCase + changedWordsStr + strBeforeLastWordAndCommand + strAfterCommand
-
-		// fmt.Println("worked 2")
-
-		return s
-	}
-
-	lenOfFirstWordToChange := len(matchesWordsBefore[indexFirstWordToChange])
-
-	strBeforeChangedWords := s[:matchesWordsBefore[indexFirstWordToChange][lenOfFirstWordToChange-1]]
-	// lastChangedWordIndexs := matchesWordsBefore[len(matchesWordsBefore)-1][len(matchesWordsBefore[len(matchesWordsBefore)-1])-1]
-
-	s = strBeforeChangedWords + changedWordsStr + strBeforeLastWordAndCommand + strAfterCommand
-
-	// fmt.Println(strBeforeChangedWords)
-	// fmt.Println("worked 3")
 
 	return s
 }
