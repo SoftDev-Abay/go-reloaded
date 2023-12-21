@@ -289,6 +289,10 @@ func CaseAllCommand(s string) string {
 }
 
 func toCaseMatch(matches []int, s string, toCase func(string) string, n int) string {
+	if n == 0 {
+		return s
+	}
+	
 	strBeforeCommand := s[:matches[0]]
 	strAfterCommand := s[matches[1]:]
 
