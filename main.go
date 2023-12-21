@@ -277,16 +277,31 @@ func toCaseMatch(matches []int, s string, toCase func(string) string, n int) str
 	indexFirstWordToChange := countMatchesWordsBefore - 1 - n
 	strBeforeLastWordAndCommand := s[matchesWordsBefore[countMatchesWordsBefore-1][1]:matches[0]]
 
+	if strBeforeLastWordAndCommand == " " {
+		strBeforeLastWordAndCommand = ""
+	}
+
 	if indexFirstWordToChange < 0 {
 		missedFirstWord := s[matchesWordsBefore[0][0]:matchesWordsBefore[0][1]]
 		missedFirstWordToCase := toCase(strings.ToLower(missedFirstWord))
 		s = s[:matchesWordsBefore[0][0]] + missedFirstWordToCase + changedWordsStr + strBeforeLastWordAndCommand + strAfterCommand
+
+		// fmt.Printf("s[:matchesWordsBefore[0][0]]: `%s`\n", s[:matchesWordsBefore[0][0]])
+		// fmt.Printf("missedFirstWordToCase: `%s`\n", missedFirstWordToCase)
+		// fmt.Printf("changedWordsStr: `%s`\n", changedWordsStr)
+		// fmt.Printf("strBeforeLastWordAndCommand: `%s`\n", strBeforeLastWordAndCommand)
+		// fmt.Printf("strAfterCommand: `%s`\n", strAfterCommand)
+
+		// fmt.Println("worked 1")
 		return s
 	} else if indexFirstWordToChange == 0 {
 		missedFirstWord := s[matchesWordsBefore[0][0]:matchesWordsBefore[0][1]]
 		missedFirstWordToCase := toCase(strings.ToLower(missedFirstWord))
 
 		s = s[:matchesWordsBefore[indexFirstWordToChange][0]] + missedFirstWordToCase + changedWordsStr + strBeforeLastWordAndCommand + strAfterCommand
+
+		// fmt.Println("worked 2")
+
 		return s
 	}
 
@@ -298,6 +313,7 @@ func toCaseMatch(matches []int, s string, toCase func(string) string, n int) str
 	s = strBeforeChangedWords + changedWordsStr + strBeforeLastWordAndCommand + strAfterCommand
 
 	// fmt.Println(strBeforeChangedWords)
+	// fmt.Println("worked 3")
 
 	return s
 }

@@ -2,6 +2,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -43,10 +44,14 @@ func TestFormatTextWithTestData(t *testing.T) {
 			// Run your text formatting function
 			result := FormatText(string(input))
 
+			indicator := fmt.Sprintf("\nTest: `%s`\nExpected:\n`%s`\nGot:\n`%s`", input, expectedOutput, result)
+			t.Log(indicator)
+
 			// Perform assertions on the result
 			if result != string(expectedOutput) {
-				t.Errorf("Test failed. Expected:\n`%s`\nGot:\n`%s`", expectedOutput, result)
+				t.Error("Test failed.")
 			}
+
 		})
 	}
 }
