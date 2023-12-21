@@ -15,7 +15,7 @@ func main() {
 		fmt.Println("Two files accepted, ex: sample.txt result.txt")
 		return
 	}
-
+ /// txt
 	inputByte, err := os.ReadFile(args[0])
 	if err != nil {
 		fmt.Println(err)
@@ -118,6 +118,30 @@ func punctuationCorrect(s string) string {
 
 		match = comp.FindStringSubmatchIndex(s)
 	}
+
+	patternBetweenWords := `([a-zA-Z]+)(\.{3}|!\?|[\?!.,:;])([a-zA-Z]+)`
+	comp = regexp.MustCompile(patternBetweenWords)
+
+	match = comp.FindStringSubmatchIndex(s)
+
+	for len(match) > 1 {
+
+		s = correctPunctuationMatchBetweenWords(s, match)
+
+		match = comp.FindStringSubmatchIndex(s)
+	}
+
+	return s
+}
+
+func correctPunctuationMatchBetweenWords(s string, match []int) string {
+	strPunctuation := s[match[4]:match[5]]
+	strBeforePunctuation := s[:match[3]]
+	separator := " "
+
+	strAfterPunctuation := s[match[6]:]
+	s = strBeforePunctuation + strPunctuation + separator + strAfterPunctuation
+
 	return s
 }
 
@@ -138,7 +162,7 @@ func correctPunctuationMatch(s string, match []int) string {
 }
 
 func articleACorrect(s string) string {
-	patternA := `\b([aA])(\s+[\?!.,:;\(]*\s*[AEIOUHaeiouh][a-zA-Z]+)`
+	patternA := `\b([aA])(\s+[\?!.,:;\(]*\s*[AEIOUHaeiouh][a-zA-Z]+)` // to include not only words but also sing charachters change + to *
 	comp := regexp.MustCompile(patternA)
 	countIncorrectArticleMatches := len(comp.FindAllString(s, -1))
 
@@ -149,7 +173,7 @@ func articleACorrect(s string) string {
 
 	}
 
-	patternAn := `\b([aA][nN])(\s+[\?!.,:;\(]*\s*[bcdfghjklmnpqrstvwxyzBCDFGHJKLMNPQRSTVWXYZ][a-zA-Z]+)`
+	patternAn := `\b([aA][nN])(\s+[\?!.,:;\(]*\s*[bcdfghjklmnpqrstvwxyzBCDFGHJKLMNPQRSTVWXYZ][a-zA-Z]+)` // to include not only words but also sing charachters change + to *
 	comp = regexp.MustCompile(patternAn)
 	countIncorrectArticleMatches = len(comp.FindAllString(s, -1))
 
@@ -274,6 +298,14 @@ func toCaseMatch(matches []int, s string, toCase func(string) string, n int) str
 	}
 
 	fmt.Printf("'%s'",strBeforeCommandAndLastWord)
+
+	// charBeforeCommad := string(s[matches[0]-1])
+
+	// if charBeforeCommad == " " {
+		
+	// }
+
+	// fmt.Printf("'%s'", charBeforeCommad)
 
 	s = s[:firstIndexOfFirstWord] + strToCase + strBeforeCommandAndLastWord + strAfterCommand
 
